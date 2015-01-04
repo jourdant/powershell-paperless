@@ -5,7 +5,7 @@
 # Modified:  04/01/2015 05:44PM NZDT
 #
 
-#Environment Properties
+#properties
 #================================================================
 $tesseract_url = "https://nuget.org/api/v2/package/Tesseract"
 $tessdata_url = "https://nuget.org/api/v2/package/tesseract-ocr"
@@ -33,10 +33,10 @@ If ((Test-Path $tesseract_zip_name) -eq $False) {
 
 If ((Test-Path $tesseract_zip_name) -eq $True)
 {
-	$zip = [IO.Compression.ZipFile]::OpenRead($tesseract_zip_name).Entries
+	$zip = [IO.Compression.ZipFile]::OpenRead($tesseract_zip_name)
 	
 	#extract tesseract libraries
-	$zip | Where FullName -match "(x86|x64)|net451/tesseract\.(?:dll|xml)" | % {
+	$zip.Entries | Where FullName -match "(x86|x64)|net451/tesseract\.(?:dll|xml)" | % {
 		$dir = (Get-Item $lib_dir_name).FullName
 		If ($_.FullName.Contains("content")) { $dir +=  "\" + $matches[0] }
 		If ((Test-Path $dir) -eq $False) { mkdir $dir | Out-Null }
@@ -44,6 +44,8 @@ If ((Test-Path $tesseract_zip_name) -eq $True)
 		$file = $dir + "\" + $_.Name
 		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $file, $true) 
 	}
+
+	$zip.Dispose()
 }
 
 #download and extract tesseract data files
@@ -54,16 +56,18 @@ If ((Test-Path $tessdata_zip_name) -eq $False) {
 
 If ((Test-Path $tessdata_zip_name) -eq $True)
 {
-	$zip = [IO.Compression.ZipFile]::OpenRead($tessdata_zip_name).Entries
+	$zip = [IO.Compression.ZipFile]::OpenRead($tessdata_zip_name)
 	
 	#extract tessdata libraries
-	$zip | Where FullName -match "eng" | % {
+	$zip.Entries | Where FullName -match "eng" | % {
 		$dir = (Get-Item $lib_dir_name).FullName + "\tessdata"
 		If ((Test-Path $dir) -eq $False) { mkdir $dir | Out-Null }
 		
 		$file = $dir + "\" + $_.Name
 		[IO.Compression.ZipFileExtensions]::ExtractToFile($_, $file, $true) 
 	}
+
+	$zip.Dispose()
 }
 
 #remove temp zip files
