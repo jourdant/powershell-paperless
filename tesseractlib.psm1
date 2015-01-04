@@ -2,7 +2,7 @@
 # Title:     tesseractlib.psm1
 # Author:    Jourdan Templeton
 # Email:     hello@jourdant.me
-# Modified:  04/01/2015 05:44PM NZDT
+# Modified:  04/01/2015 08:30PM NZDT
 #
 
 Add-Type -AssemblyName "System.Drawing"
@@ -38,19 +38,21 @@ Get-TessTextFromImage -Image $image
 Function Get-TessTextFromImage([Parameter(Mandatory=$true, ValueFromPipeline=$true, ParameterSetName="ImageObject")][System.Drawing.Image]$Image,
                                [Parameter(Mandatory=$true, ValueFromPipeline=$true, ParameterSetName="FilePath")][Alias("FullName")][String]$Path)
 {
-	#load image if path is a param
-	If ($PsCmdlet.ParameterSetName -eq "FilePath") { $Image = New-Object System.Drawing.Bitmap((Get-Item $path).Fullname) } 
+	Process {
+		#load image if path is a param
+		If ($PsCmdlet.ParameterSetName -eq "FilePath") { $Image = New-Object System.Drawing.Bitmap((Get-Item $path).Fullname) } 
 
-	#perform OCR on image
-	$pix = [Tesseract.PixConverter]::ToPix($image)
-	$page = $tesseract.Process($pix)
-	
-	#build return object
-	$ret = New-Object PSObject -Property @{"Text"= $page.GetText();
-										   "Confidence"= $page.GetMeanConfidence()}
+		#perform OCR on image
+		$pix = [Tesseract.PixConverter]::ToPix($image)
+		$page = $tesseract.Process($pix)
+		
+		#build return object
+		$ret = New-Object PSObject -Property @{"Text"= $page.GetText();
+											   "Confidence"= $page.GetMeanConfidence()}
 
-	#clean up references
-	$page.Dispose()
-	If ($PsCmdlet.ParameterSetName -eq "FilePath") { $image.Dispose() } 
-	return $ret
+		#clean up references
+		$page.Dispose()
+		If ($PsCmdlet.ParameterSetName -eq "FilePath") { $image.Dispose() } 
+		return $ret
+	}
 }
