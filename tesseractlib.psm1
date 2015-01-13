@@ -6,7 +6,7 @@
 #
 
 Add-Type -AssemblyName "System.Drawing"
-Add-Type -Path ".\Lib\Tesseract.dll"
+Add-Type -Path "$PSScriptRoot\Lib\Tesseract.dll"
 $tesseract = New-Object Tesseract.TesseractEngine((Get-Item ".\Lib\tessdata").FullName, "eng", [Tesseract.EngineMode]::Default, $null)
 
 <#
@@ -35,9 +35,12 @@ New-Object System.Drawing.Bitmap("C:\test.jpg") | Get-TessTextFromImage
 $image = New-Object System.Drawing.Bitmap("c:\test.jpg")
 Get-TessTextFromImage -Image $image
 #>
-Function Get-TessTextFromImage([Parameter(Mandatory=$true, ValueFromPipeline=$true, ParameterSetName="ImageObject")][System.Drawing.Image]$Image,
-                               [Parameter(Mandatory=$true, ValueFromPipeline=$true, ParameterSetName="FilePath")][Alias("FullName")][String]$Path)
+Function Get-TessTextFromImage()
 {
+	Param(
+		[Parameter(Mandatory=$true, ValueFromPipeline=$true, ParameterSetName="ImageObject")][System.Drawing.Image]$Image,
+		[Parameter(Mandatory=$true, ValueFromPipeline=$true, ParameterSetName="FilePath")][Alias("FullName")][String]$Path
+	)
 	Process {
 		#load image if path is a param
 		If ($PsCmdlet.ParameterSetName -eq "FilePath") { $Image = New-Object System.Drawing.Bitmap((Get-Item $path).Fullname) } 
