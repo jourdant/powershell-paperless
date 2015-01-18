@@ -74,7 +74,7 @@ If ((Test-Path $tessdata_zip_name) -eq $True)
 	Remove-Item $tessdata_zip_name -Force
 }
 
-#download and extract tesseract data files
+#download and extract iTextSharp library
 If ((Test-Path $itextsharp_zip_name) -eq $False) { 
 	Write-Host "Downloading:" $itextsharp_url "  To:" $itextsharp_zip_name
 	Invoke-WebRequest -Uri $itextsharp_url -OutFile  $itextsharp_zip_name
